@@ -2,10 +2,10 @@ import { React, useState, useEffect } from "react";
 
 import axios from "axios";
 import "../styles/MyFirstPage.css";
-// const myURL = "http://176.57.215.24:3001/" // Хостинг
+const myURL = "http://176.57.215.24:3001/" // Хостинг
 
 // const myURL = "http://192.168.0.36:3001/"
-const myURL = "http://localhost:3001/";
+//const myURL = "http://localhost:3001/";
 
 //const tg = window.Telegram.WebApp;
 

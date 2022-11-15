@@ -3,9 +3,9 @@ const express = require("express");
 const { Telegraf, Markup } = require("telegraf");
 const db = require("../db");
 
-//const token = '5708802519:AAF_ZaNmo4tgexx2YQdNNaxBqUHjuwpBWcg' // токен основного бота
+const token = '5708802519:AAF_ZaNmo4tgexx2YQdNNaxBqUHjuwpBWcg' // токен основного бота
 
-const token = "5671279982:AAHBixYOEnmGJLv6xkVDLrQlVNFDnLUB7PY";
+//const token = "5671279982:AAHBixYOEnmGJLv6xkVDLrQlVNFDnLUB7PY"; // Мой токен
 let nprChatID;
 
 // const token = "5755766246:AAHB8VeAhwN8Qns3V8wtuXyz4G20OvHZiuY"; // Арти
