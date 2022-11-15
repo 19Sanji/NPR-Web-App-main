@@ -2,12 +2,12 @@ import { React, useState, useEffect } from "react";
 
 import axios from "axios";
 import "../styles/MyFirstPage.css";
- const myURL = "http://176.57.215.24:3001/" // Хостинг
+// const myURL = "http://176.57.215.24:3001/" // Хостинг
 
 // const myURL = "http://192.168.0.36:3001/"
-//const myURL = "http://localhost:3001/";
+const myURL = "http://localhost:3001/";
 
-const tg = window.Telegram.WebApp;
+//const tg = window.Telegram.WebApp;
 
 function MyFirstPage() {
   const [fio, setFio] = useState("");
@@ -17,6 +17,7 @@ function MyFirstPage() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [nprName, setNprName] = useState("");
   const [nprID, SetNprID] = useState("");
+  const [npr, setNpr] = useState("");
   const [myLocation, setMyLocation] = useState("");
   const [region, setRegion] = useState("");
   const [congrats, setCongrats] = useState("");
@@ -40,7 +41,7 @@ function MyFirstPage() {
       return;
     }
 
-    console.log(fioArray);
+    //console.log(fioArray);
 
     let myformData = new FormData();
 
@@ -52,13 +53,14 @@ function MyFirstPage() {
     myformData.append("village", myLocation + ", " + region);
     myformData.append("status", status);
     myformData.append("offspring", offspring);
-    myformData.append("nprName", nprName);
-    myformData.append("nprID", nprID);
+    myformData.append("nprName", npr['name']);
+    myformData.append("nprID", npr['npr_id']);
+    myformData.append("nprChatID", npr['chat_id']);
     myformData.append("congrats", congrats);
     myformData.append("myFile", myFile);
     myformData.append("publishionDate", publishionDate);
     myformData.append("price", price);
-    myformData.append("chat_Id", tg.initDataUnsafe.user.id);
+    //myformData.append("chat_Id", tg.initDataUnsafe.user.id);
 
     await axios.post(myURL, myformData, {
       headers: { "Content-type": "multipart/form-data" },
@@ -70,6 +72,15 @@ function MyFirstPage() {
     if (count_congrats_words.length === 0) setPrice(40 + " руб.");
     else setPrice(count_congrats_words * 40 + " руб.");
   }, [congrats]);
+
+  useEffect(() => {
+    for (let i = 0; i < nprArray.length; i++) {
+      if(nprArray[i]['name']===nprName && nprArray[i]['location']===region){
+        setNpr(nprArray[i]);
+      }
+    }
+  }, [nprName])
+  
 
   useEffect(() => {
     let tempArray = [];
@@ -87,11 +98,11 @@ function MyFirstPage() {
   useEffect(() => {
     axios.get(myURL).then((row) => {
       setNprLocation(row.data);
+      console.log(row.data);
     });
-    console.log('Информация о пользователе');
-    console.log(tg.initDataUnsafe);
+    console.log("Информация о пользователе");
+    //console.log(tg.initDataUnsafe);
   }, []);
-
 
   // Нахожу не повторяющиеся населенные пункты
   useEffect(() => {

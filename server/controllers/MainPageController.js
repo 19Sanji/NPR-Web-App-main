@@ -1,20 +1,26 @@
+const e = require("express");
 const express = require("express");
 const { Telegraf, Markup } = require("telegraf");
 const db = require("../db");
 
-//const token = '5709913059:AAHHzuixHE6zgwY0RH6WEpFB1besJ7M-n-4' // токен основного бота
+//const token = '5708802519:AAF_ZaNmo4tgexx2YQdNNaxBqUHjuwpBWcg' // токен основного бота
 
 const token = "5671279982:AAHBixYOEnmGJLv6xkVDLrQlVNFDnLUB7PY";
-const chat_Id = "710428379";
+let nprChatID;
 
 // const token = "5755766246:AAHB8VeAhwN8Qns3V8wtuXyz4G20OvHZiuY"; // Арти
-// const chat_Id = "200094164"; // Арти
+// const nprChatID = "200094164"; // Арти
 
 class MainPageController {
   async GetData(req, res) {
     try {
       console.log(req.body);
-
+      if (req.body.nprChatID === 'null') {
+        nprChatID = "111";
+      } else {
+        nprChatID = req.body.nprChatID;
+      }
+      console.log(nprChatID);
       let oprder_id;
 
       await db.connect((err) => {
@@ -37,7 +43,7 @@ class MainPageController {
                     const id_birthdays = rows[0]["LAST_INSERT_ID()"];
                     console.log("id_birthdays " + id_birthdays);
                     db.query(
-                      `INSERT INTO \`orders\` (\`text\`, \`publication_date\`, \`npr_id\`, \`chat_id\`, \`status\`, \`offsprings\`, \`birthdays_id\`, \`number\`, \`village\`) VALUES ('${req.body.congrats}','${req.body.publishionDate}','${req.body.nprID}','${req.body.chat_Id}','${req.body.status}','${req.body.offspring}','${id_birthdays}','${req.body.number}','${req.body.village}')`,
+                      `INSERT INTO \`orders\` (\`text\`, \`publication_date\`, \`npr_id\`, \`chat_id\`, \`status\`, \`offsprings\`, \`birthdays_id\`, \`number\`, \`village\`) VALUES ('${req.body.congrats}','${req.body.publishionDate}','${req.body.nprID}','${nprChatID}','${req.body.status}','${req.body.offspring}','${id_birthdays}','${req.body.number}','${req.body.village}')`,
                       (err, rows, fields) => {
                         if (err) {
                           console.log(err);
@@ -53,10 +59,12 @@ class MainPageController {
                               } else {
                                 oprder_id = rows[0]["LAST_INSERT_ID()"];
                                 //console.log("oprder_id " + oprder_id);
+                                console.log("nprChatID " + nprChatID);
                                 sendMessageFunc(
                                   oprder_id,
                                   req.files.myFile.data, // Получаемый файл (картинка)
-                                  req.body
+                                  req.body,
+                                  nprChatID
                                 );
                               }
                             }
@@ -97,7 +105,7 @@ class MainPageController {
 
 // Функции ---------------------------------------------------------------------------------------------------
 
-async function sendMessageFunc(oprder_id, picture, reqBody) {
+async function sendMessageFunc(oprder_id, picture, reqBody, nprChatID) {
   const fileContent =
     "Населенный пункт: " +
     reqBody.village +
@@ -125,19 +133,19 @@ async function sendMessageFunc(oprder_id, picture, reqBody) {
   fileBuffer.write(fileContent, "utf-8");
 
   await bot.telegram
-    .sendMediaGroup(chat_Id, [
+    .sendMediaGroup(nprChatID, [
       {
         type: "document",
         media: {
           source: picture,
-          filename: "photo",
+          filename: `photo_${oprder_id}.jpg`,
         },
       },
       {
         type: "document",
         media: {
           source: fileBuffer,
-          filename: `order_${oprder_id}.txt`,
+          filename: `info_${oprder_id}.txt`,
         },
         caption: `*#order${oprder_id}*\n\n*Редакция:* ${reqBody.nprName} \n\n*Дата публикации:*\n${reqBody.publishionDate}\n\n*Предположительная стоимость:* ${reqBody.price}`,
         parse_mode: "Markdown",
@@ -148,13 +156,17 @@ async function sendMessageFunc(oprder_id, picture, reqBody) {
     });
 
   bot.telegram
-    .sendMessage(chat_Id, `*#order${oprder_id}*\nКакая-то важная информация`, {
-      parse_mode: "Markdown",
-      ...Markup.inlineKeyboard([
-        Markup.button.callback("Принять ✅", "yes"),
-        Markup.button.callback("Отклонить ❌", "no"),
-      ]),
-    })
+    .sendMessage(
+      nprChatID,
+      `*#order${oprder_id}*\nКакая-то важная информация`,
+      {
+        parse_mode: "Markdown",
+        ...Markup.inlineKeyboard([
+          Markup.button.callback("Принять ✅", "yes"),
+          Markup.button.callback("Отклонить ❌", "no"),
+        ]),
+      }
+    )
     .catch((err) => {
       console.log(err);
     });
