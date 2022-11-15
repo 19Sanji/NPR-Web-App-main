@@ -2,6 +2,8 @@ const express = require("express");
 const { Telegraf, Markup } = require("telegraf");
 const db = require("../db");
 
+//const token = '5709913059:AAHHzuixHE6zgwY0RH6WEpFB1besJ7M-n-4' // токен основного бота
+
 const token = "5671279982:AAHBixYOEnmGJLv6xkVDLrQlVNFDnLUB7PY";
 const chat_Id = "710428379";
 
